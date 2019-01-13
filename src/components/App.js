@@ -6,6 +6,7 @@ const GlobalStyle = createGlobalStyle`
 @import url('https://fonts.googleapis.com/css?family=Sarabun:400,700');
     :root {
     --grey: #343436;
+    --green: #03BA9B;
     }
     html {
     font-size: 62.5%; /* font-size 1em = 10px on default browser settings */
@@ -24,12 +25,79 @@ const GlobalStyle = createGlobalStyle`
     .hide {
         display: none;
     }
+    .warning {
+        color: #E20404;
+    }
     .show {
         display: block;
     }
     .bond-form {
         background: white;
+        max-width: 700px;
+        width: 100%;
+        display: grid;
+        justify-content: center;
+        padding: 20px 0 20px 0;
+        margin: 0 auto;
+        border-radius: 10px;
+        -webkit-box-shadow: 10px 10px 53px -2px rgba(133,133,133,1);
+-moz-box-shadow: 10px 10px 53px -2px rgba(133,133,133,1);
+box-shadow: 10px 10px 53px -2px rgba(133,133,133,1);
+
+        h1 {
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        form {
+            max-width: 600px;
+            width: 600px;
+
+            label {
+                font-size: 2rem;
+                color: var(--green);
+            }
+
+            input {
+                margin: 20px 0px 20px 0;
+                width: 94%;
+                height: 30px;
+                padding-left: 30px;
+                border-top: 1px solid #898989;
+                border-bottom: 1px solid #898989;
+                border-left: 1px solid #898989;
+                border-right: 1px solid #898989;
+                font-size: 2rem;
+            }
+            .form-label {
+                /* background: #F6F7FA; */
+                padding: 10px;
+                font-weight: 700;
+                text-transform: uppercase;
+            }
+            select {
+                width: 100%;
+                border: 2px solid #E5E5E5;
+                font-size: 2rem;
+                
+            }
+            button {
+                width: 100%;
+                border: 0;
+                background: #F93C59;
+                color: #ffffff;
+                text-transform: uppercase;
+                text-align: center;
+                padding: 20px;
+                font-size: 2rem;
+                cursor: pointer;
+            }
+        }
+        .form-member-fee {
+            padding-left: 10px;
+        }
     }
+
 `
 class App extends Component {
     constructor(props) {
@@ -59,6 +127,7 @@ class App extends Component {
         this.errorMonthlyRef = React.createRef();
         this.errorFormSubmitRef = React.createRef();
         this.errorLoadFormRef = React.createRef();
+        this.errorPostCodeRef = React.createRef();
     }
     componentDidMount(){
         this.getFlatbondAPI();
@@ -171,30 +240,30 @@ class App extends Component {
         // Input validation for the rent fields
         if(selectedPayment === 'week' && rent < 25){
             console.log(this.state.weeklyRentError);
-            this.weeklyPayRef.current.style.border = '2px solid red';
+            this.weeklyPayRef.current.style.border = '2px solid #E20404';
             this.errorWeeklyRef.current.classList.add('show');
             this.setState({canSubmit: false});
             
         } else if(selectedPayment === 'week' && rent > 2000) {
             console.log(this.state.weeklyRentError);
-            this.weeklyPayRef.current.style.border = '2px solid red';
+            this.weeklyPayRef.current.style.border = '2px solid #E20404';
             this.errorWeeklyRef.current.classList.add('show');
             this.setState({canSubmit: false});
             
         } else if(selectedPayment === 'month' && rent < 110) {
             console.log(this.state.monthlyRentError);
-            this.monthlyPayRef.current.style.border = '2px solid red';
+            this.monthlyPayRef.current.style.border = '2px solid #E20404';
             this.errorMonthlyRef.current.classList.add('show');
             this.setState({canSubmit: false});
 
         } else if(selectedPayment === 'month' && rent > 8660){
             console.log(this.state.monthlyRentError);
-            this.monthlyPayRef.current.style.border = '2px solid red';
+            this.monthlyPayRef.current.style.border = '2px solid #E20404';
             this.errorMonthlyRef.current.classList.add('show');
             this.setState({canSubmit: false});
         } else {
-            this.weeklyPayRef.current.style.border = '2px solid green';
-            this.monthlyPayRef.current.style.border = '2px solid green';
+            this.weeklyPayRef.current.style.border = '2px solid #03BA9B';
+            this.monthlyPayRef.current.style.border = '2px solid #03BA9B';
             this.errorWeeklyRef.current.classList.remove('show');
             this.errorWeeklyRef.current.classList.add('hide');
             this.errorMonthlyRef.current.classList.remove('show');
@@ -215,10 +284,12 @@ class App extends Component {
         const re = /^([A-PR-UWYZ0-9][A-HK-Y0-9][AEHMNPRTVXY0-9]?[ABEHMNPRVWXY0-9]? {1,2}[0-9][ABD-HJLN-UW-Z]{2}|GIR 0AA)$/;
 
         if(!re.test(postcode)){
-            this.postcodeRef.current.style.border = '2px solid red';
+            this.postcodeRef.current.style.border = '2px solid #E20404';
+            
             this.setState({canSubmit: false});
         } else {
-            this.postcodeRef.current.style.border = '2px solid green';
+            this.postcodeRef.current.style.border = '2px solid #03BA9B';
+           
             this.setState({canSubmit: true});
         }
 
@@ -232,7 +303,7 @@ class App extends Component {
                 <div><h1>Create Flatbond</h1></div>
                     <form onSubmit={this.onFormSubmit}>
                         <div>
-                        <div><label>Rent</label></div>
+                        <div className="form-label"><label>Rent</label></div>
                         <div><select ref={this.paymentSelectRef} onChange={this.onSelectedOption}>
                             <option value="week">Weekly</option>
                             <option value="month">Monthly</option>
@@ -240,18 +311,21 @@ class App extends Component {
                         </div>
                         <div><input ref={this.weeklyPayRef} type="number" placeholder="Weekly Rent" value={this.state.rent} onChange={e => this.setState({rent: e.target.value})} onBlur={this.calcMemberFee} />
                         <input ref={this.monthlyPayRef} type="number" placeholder="Monthly Rent" value={this.state.rent} onChange={e => this.setState({rent: e.target.value})} onBlur={this.calcMemberFee} /></div>
-                        <p className="hide" ref={this.errorWeeklyRef}>{this.state.weeklyRentError}</p>
-                        <p className="hide" ref={this.errorMonthlyRef}>{this.state.monthlyRentError}</p>
-                        <div>
+                        <p className="hide warning" ref={this.errorWeeklyRef}>{this.state.weeklyRentError}</p>
+                        <p className="hide warning" ref={this.errorMonthlyRef}>{this.state.monthlyRentError}</p>
+                        <div className="form-label">
                         <label>Membership Fee</label>
-                        <p>{this.state.memberFeeCalc}</p>
+                        
                         </div>
+                        <div className="form-member-fee"><p>£{this.state.memberFeeCalc}</p></div>
                         <div>
-                        <div><label>Postcode</label></div>
-                        <div><input ref={this.postcodeRef} type="text" placeholder="Postcode" value={this.state.postcode} onChange={e => this.setState({postcode: e.target.value})} onBlur={this.validatePostCode} /></div>
+                        <div className="form-label"><label>Postcode</label></div>
+                        <div><input ref={this.postcodeRef} type="text" placeholder="Postcode" value={this.state.postcode} onChange={e => this.setState({postcode: e.target.value})} onBlur={this.validatePostCode} />
+                        <p className="hide warning">{this.state.monthlyRentError}</p>
                         </div>
-                        <div><input type="submit" value="Submit" onClick={this.onFormSubmit} /></div>
-                        <div><p className="hide" ref={this.errorFormSubmitRef}>{this.state.submitError}</p></div>
+                        </div>
+                        <div><button type="submit" onClick={this.onFormSubmit}>Create Flatbond</button></div>
+                        <div><p className="hide warning" ref={this.errorFormSubmitRef}>{this.state.submitError}</p></div>
                     </form>
                 </div>
             </React.Fragment>
