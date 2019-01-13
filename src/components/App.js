@@ -3,14 +3,32 @@ import axios from 'axios';
 import styled, { createGlobalStyle } from 'styled-components';
 
 const GlobalStyle = createGlobalStyle`
+@import url('https://fonts.googleapis.com/css?family=Sarabun:400,700');
+    :root {
+    --grey: #343436;
+    }
+    html {
+    font-size: 62.5%; /* font-size 1em = 10px on default browser settings */
+    }
     body {
-        background: #bada55;
+            /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#31bca6+0,03ba9b+100 */
+        background: #31bca6; /* Old browsers */
+        background: -moz-linear-gradient(45deg, #31bca6 0%, #03ba9b 100%); /* FF3.6-15 */
+        background: -webkit-linear-gradient(45deg, #31bca6 0%,#03ba9b 100%); /* Chrome10-25,Safari5.1-6 */
+        background: linear-gradient(45deg, #31bca6 0%,#03ba9b 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+        filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#31bca6', endColorstr='#03ba9b',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+        font-family: 'Sarabun', sans-serif;
+        font-size: 1.6rem;
+        color: var(--grey);
     }
     .hide {
         display: none;
     }
     .show {
         display: block;
+    }
+    .bond-form {
+        background: white;
     }
 `
 class App extends Component {
@@ -27,7 +45,8 @@ class App extends Component {
             canSubmit: false,
             weeklyRentError: 'The miniumum weekly rent is £25, and the maximum is £2000.',
             monthlyRentError: 'The miniumum monthly rent is £110, and the maximum is £8660.',
-            submitError: 'Please input valid information, to create your flatbond.'
+            submitError: 'Please input valid information, to create your flatbond.',
+            formLoadingFail: 'Error: Failed to load Flatbond form data'
         }
 
         // DOM element references
@@ -39,6 +58,7 @@ class App extends Component {
         this.errorWeeklyRef = React.createRef();
         this.errorMonthlyRef = React.createRef();
         this.errorFormSubmitRef = React.createRef();
+        this.errorLoadFormRef = React.createRef();
     }
     componentDidMount(){
         this.getFlatbondAPI();
@@ -58,8 +78,14 @@ class App extends Component {
         // Shows the form after a success 200 reponse from the flatbond API
         this.flatbondFormRef.current.classList.remove('hide');
 
+        // Hides the error in the front end form after a failed 404 reponse from the flatbond API
+        this.errorLoadFormRef.current.classList.add('hide');
+
     } catch(err) {
-        console.log(err)
+        console.log(err);
+
+        // Shows the error in the front end form after a failed 404 reponse from the flatbond API
+        this.errorLoadFormRef.current.classList.remove('hide');
     }
     }
     onFormSubmit = (e) => {
@@ -201,8 +227,9 @@ class App extends Component {
         return(
             <React.Fragment>
                 <GlobalStyle />
-                <h1>Flatbond</h1>
-                <div ref={this.flatbondFormRef} className="hide">
+                <div className="hide" ref={this.errorLoadFormRef}><h1>{this.state.formLoadingFail}</h1></div>
+                <div ref={this.flatbondFormRef} className="bond-form hide">
+                <div><h1>Create Flatbond</h1></div>
                     <form onSubmit={this.onFormSubmit}>
                         <div>
                         <div><label>Rent</label></div>
