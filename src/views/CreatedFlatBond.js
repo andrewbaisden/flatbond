@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 class CreatedFlatBond extends Component {
     state = {
         rent: '',
@@ -25,6 +26,7 @@ class CreatedFlatBond extends Component {
                 <p>{this.state.rent}</p>
                 <p>{this.state.postcode}</p>
                 <p>{this.state.memberFee}</p>
+                <Link href='/' to='/'>Create a Flatbond</Link>
             </React.Fragment>
         )
     }
