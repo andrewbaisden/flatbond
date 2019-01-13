@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import styled, { createGlobalStyle } from 'styled-components';
+import { withRouter } from 'react-router-dom';
 
 const GlobalStyle = createGlobalStyle`
     body {
@@ -18,7 +19,7 @@ class App extends Component {
         this.state = {
             dataMemberFee: '',
             dataMemberFeeAmount: '',
-            memberFeeCalc: 10,
+            memberFeeCalc: 0,
             rent: 0,
             postcode: ''
         }
@@ -30,7 +31,7 @@ class App extends Component {
     componentDidMount(){
         this.getFlatbondAPI();
         this.onSelectedOption();
-        // this.calcMemberFee();
+        
     }
    async getFlatbondAPI(){
     try {
@@ -51,6 +52,25 @@ class App extends Component {
         console.log('Clicked Form Submit Button');
         console.log(this.state.rent);
         console.log(this.state.postcode);
+        console.log(this.state.memberFeeCalc);
+
+        axios.post('https://cxynbjn3wf.execute-api.eu-west-2.amazonaws.com/production/flatbond', {
+            rent: this.state.rent,
+            postcode: this.state.postcode
+        })
+        .then(response => {
+            console.log(response)
+            console.log(response.data.status)
+            const status = response.data.status;
+
+            if(status === 'created') {
+                console.log('The flatbond was created');
+                this.props.history.push('/created-flatbond');
+            }
+        })
+        .catch(error => {
+            console.log(error)
+        })
 
     }
     onSelectedOption = () => {
@@ -69,7 +89,7 @@ class App extends Component {
         }
 
     }
-    calcMemberFee(){
+    calcMemberFee = () => {
         console.log('test')
         console.log('Rent', this.state.rent)
         
@@ -89,6 +109,8 @@ class App extends Component {
             calcMembersFee = membershipFeeAmount;
         }
 
+        this.setState({memberFeeCalc: calcMembersFee})
+
         console.log('Calculated members Fee', calcMembersFee)
        
     }
@@ -104,13 +126,14 @@ class App extends Component {
                             <option value="week">Weekly</option>
                             <option value="month">Monthly</option>
                         </select>
-                        <input ref={this.weeklyPayRef} type="number" placeholder="Weekly Rent" value={this.state.rent} onChange={e => this.setState({rent: e.target.value})} onBlur={this.calcMemberFee()} />
-                        <input ref={this.monthlyPayRef} type="number" placeholder="Monthly Rent" value={this.state.rent} onChange={e => this.setState({rent: e.target.value})} />
+                        <input ref={this.weeklyPayRef} type="number" placeholder="Weekly Rent" value={this.state.rent} onChange={e => this.setState({rent: e.target.value})} onBlur={this.calcMemberFee} />
+                        <input ref={this.monthlyPayRef} type="number" placeholder="Monthly Rent" value={this.state.rent} onChange={e => this.setState({rent: e.target.value})} onBlur={this.calcMemberFee} />
                         <label>Membership Fee</label>
                         <p>{this.state.memberFeeCalc}</p>
                         <label>Postcode</label>
                         <input type="text" placeholder="Postcode" value={this.state.postcode} onChange={e => this.setState({postcode: e.target.value})} />
-                        <Link to={{ pathname: '/created-flatbond', state: { rent: this.state.rent, postcode: this.state.postcode } }}>Submit</Link>
+                        <Link to={{ pathname: '/created-flatbond', state: { rent: this.state.rent, postcode: this.state.postcode, memberFee: this.state.memberFeeCalc } }}>Submit</Link>
+                        <input type="submit" value="Submit" onClick={this.onFormSubmit} />
                     </form>
                 </div>
             </React.Fragment>

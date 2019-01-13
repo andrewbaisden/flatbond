@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 class CreatedFlatBond extends Component {
     state = {
         rent: '',
-        postcode: ''
+        postcode: '',
+        memberFee: ''
     }
     componentDidMount(){
         this.getData();
@@ -13,6 +14,9 @@ class CreatedFlatBond extends Component {
 
         const postcode = this.props.location.state.postcode;
         this.setState({postcode: postcode})
+
+        const memberFee = this.props.location.state.memberFee;
+        this.setState({memberFee: memberFee})
     }
     render(){
         return(
@@ -20,6 +24,7 @@ class CreatedFlatBond extends Component {
                 <h1>Created Flatbond</h1>
                 <p>{this.state.rent}</p>
                 <p>{this.state.postcode}</p>
+                <p>{this.state.memberFee}</p>
             </React.Fragment>
         )
     }
