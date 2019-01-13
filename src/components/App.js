@@ -9,6 +9,9 @@ const GlobalStyle = createGlobalStyle`
     .hide {
         display: none;
     }
+    .show {
+        display: block;
+    }
 `
 class App extends Component {
     constructor(props) {
@@ -21,7 +24,10 @@ class App extends Component {
             memberFeeCalc: 0,
             rent: 0,
             postcode: '',
-            canSubmit: false
+            canSubmit: false,
+            weeklyRentError: 'The miniumum weekly rent is £25, and the maximum is £2000.',
+            monthlyRentError: 'The miniumum monthly rent is £110, and the maximum is £8660.',
+            submitError: 'Please input valid information, to create your flatbond.'
         }
 
         // DOM element references
@@ -30,6 +36,9 @@ class App extends Component {
         this.monthlyPayRef = React.createRef();
         this.flatbondFormRef = React.createRef();
         this.postcodeRef = React.createRef();
+        this.errorWeeklyRef = React.createRef();
+        this.errorMonthlyRef = React.createRef();
+        this.errorFormSubmitRef = React.createRef();
     }
     componentDidMount(){
         this.getFlatbondAPI();
@@ -64,8 +73,10 @@ class App extends Component {
 
         // Only submits the form and redirects to the create-flatbond page if the fields have the correct validation input
       if(this.state.canSubmit === false) {
-          console.log('Cant submit form until you put in the correct data')
+          console.log(this.state.submitError);
+          this.errorFormSubmitRef.current.classList.add('show');
       } else {
+        this.errorFormSubmitRef.current.classList.add('hide');
         axios.post('https://cxynbjn3wf.execute-api.eu-west-2.amazonaws.com/production/flatbond', {
             rent: this.state.rent,
             postcode: this.state.postcode
@@ -133,27 +144,35 @@ class App extends Component {
 
         // Input validation for the rent fields
         if(selectedPayment === 'week' && rent < 25){
-            console.log('The minimum weekly, rent amount is £25');
+            console.log(this.state.weeklyRentError);
             this.weeklyPayRef.current.style.border = '2px solid red';
+            this.errorWeeklyRef.current.classList.add('show');
             this.setState({canSubmit: false});
             
         } else if(selectedPayment === 'week' && rent > 2000) {
-            console.log('The maximum weekly, rent amount is £2000');
+            console.log(this.state.weeklyRentError);
             this.weeklyPayRef.current.style.border = '2px solid red';
+            this.errorWeeklyRef.current.classList.add('show');
             this.setState({canSubmit: false});
             
         } else if(selectedPayment === 'month' && rent < 110) {
-            console.log('The minimum monthly, rent amount is £110');
+            console.log(this.state.monthlyRentError);
             this.monthlyPayRef.current.style.border = '2px solid red';
+            this.errorMonthlyRef.current.classList.add('show');
             this.setState({canSubmit: false});
 
         } else if(selectedPayment === 'month' && rent > 8660){
-            console.log('The maximum monthly, rent amount is £8660');
+            console.log(this.state.monthlyRentError);
             this.monthlyPayRef.current.style.border = '2px solid red';
+            this.errorMonthlyRef.current.classList.add('show');
             this.setState({canSubmit: false});
         } else {
             this.weeklyPayRef.current.style.border = '2px solid green';
             this.monthlyPayRef.current.style.border = '2px solid green';
+            this.errorWeeklyRef.current.classList.remove('show');
+            this.errorWeeklyRef.current.classList.add('hide');
+            this.errorMonthlyRef.current.classList.remove('show');
+            this.errorMonthlyRef.current.classList.add('hide');
             this.setState({canSubmit: true});
         }
 
@@ -185,18 +204,27 @@ class App extends Component {
                 <h1>Flatbond</h1>
                 <div ref={this.flatbondFormRef} className="hide">
                     <form onSubmit={this.onFormSubmit}>
-                        <label>Rent</label>
-                        <select ref={this.paymentSelectRef} onChange={this.onSelectedOption}>
+                        <div>
+                        <div><label>Rent</label></div>
+                        <div><select ref={this.paymentSelectRef} onChange={this.onSelectedOption}>
                             <option value="week">Weekly</option>
                             <option value="month">Monthly</option>
-                        </select>
-                        <input ref={this.weeklyPayRef} type="number" placeholder="Weekly Rent" value={this.state.rent} onChange={e => this.setState({rent: e.target.value})} onBlur={this.calcMemberFee} />
-                        <input ref={this.monthlyPayRef} type="number" placeholder="Monthly Rent" value={this.state.rent} onChange={e => this.setState({rent: e.target.value})} onBlur={this.calcMemberFee} />
+                        </select></div>
+                        </div>
+                        <div><input ref={this.weeklyPayRef} type="number" placeholder="Weekly Rent" value={this.state.rent} onChange={e => this.setState({rent: e.target.value})} onBlur={this.calcMemberFee} />
+                        <input ref={this.monthlyPayRef} type="number" placeholder="Monthly Rent" value={this.state.rent} onChange={e => this.setState({rent: e.target.value})} onBlur={this.calcMemberFee} /></div>
+                        <p className="hide" ref={this.errorWeeklyRef}>{this.state.weeklyRentError}</p>
+                        <p className="hide" ref={this.errorMonthlyRef}>{this.state.monthlyRentError}</p>
+                        <div>
                         <label>Membership Fee</label>
                         <p>{this.state.memberFeeCalc}</p>
-                        <label>Postcode</label>
-                        <input ref={this.postcodeRef} type="text" placeholder="Postcode" value={this.state.postcode} onChange={e => this.setState({postcode: e.target.value})} onBlur={this.validatePostCode} />
-                        <input type="submit" value="Submit" onClick={this.onFormSubmit} />
+                        </div>
+                        <div>
+                        <div><label>Postcode</label></div>
+                        <div><input ref={this.postcodeRef} type="text" placeholder="Postcode" value={this.state.postcode} onChange={e => this.setState({postcode: e.target.value})} onBlur={this.validatePostCode} /></div>
+                        </div>
+                        <div><input type="submit" value="Submit" onClick={this.onFormSubmit} /></div>
+                        <div><p className="hide" ref={this.errorFormSubmitRef}>{this.state.submitError}</p></div>
                     </form>
                 </div>
             </React.Fragment>
