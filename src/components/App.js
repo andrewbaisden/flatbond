@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
 import styled, { createGlobalStyle } from 'styled-components';
-import { withRouter } from 'react-router-dom';
 
 const GlobalStyle = createGlobalStyle`
     body {
@@ -24,9 +22,10 @@ class App extends Component {
             postcode: ''
         }
 
-        this.paymentSelectRef = React.createRef()
-        this.weeklyPayRef = React.createRef()
-        this.monthlyPayRef = React.createRef()
+        this.paymentSelectRef = React.createRef();
+        this.weeklyPayRef = React.createRef();
+        this.monthlyPayRef = React.createRef();
+        this.flatbondFormRef = React.createRef();
     }
     componentDidMount(){
         this.getFlatbondAPI();
@@ -42,6 +41,7 @@ class App extends Component {
         this.setState({dataMemberFeeAmount: response.data.fixed_membership_fee});
         console.log('Member Fee', this.state.dataMemberFee);
         console.log('Member Fee Amount', this.state.dataMemberFeeAmount);
+        this.flatbondFormRef.current.classList.remove('hide');
 
     } catch(err) {
         console.log(err)
@@ -65,7 +65,10 @@ class App extends Component {
 
             if(status === 'created') {
                 console.log('The flatbond was created');
-                this.props.history.push('/created-flatbond');
+                this.props.history.push({
+                    pathname: '/created-flatbond',
+                    state: { rent: this.state.rent, postcode: this.state.postcode, memberFee: this.state.memberFeeCalc }
+                });
             }
         })
         .catch(error => {
@@ -90,7 +93,6 @@ class App extends Component {
 
     }
     calcMemberFee = () => {
-        console.log('test')
         console.log('Rent', this.state.rent)
         
         const rent = this.state.rent;
@@ -119,7 +121,7 @@ class App extends Component {
             <React.Fragment>
                 <GlobalStyle />
                 <h1>Flatbond</h1>
-                <div>
+                <div ref={this.flatbondFormRef} className="hide">
                     <form onSubmit={this.onFormSubmit}>
                         <label>Rent</label>
                         <select ref={this.paymentSelectRef} onChange={this.onSelectedOption}>
@@ -132,7 +134,6 @@ class App extends Component {
                         <p>{this.state.memberFeeCalc}</p>
                         <label>Postcode</label>
                         <input type="text" placeholder="Postcode" value={this.state.postcode} onChange={e => this.setState({postcode: e.target.value})} />
-                        <Link to={{ pathname: '/created-flatbond', state: { rent: this.state.rent, postcode: this.state.postcode, memberFee: this.state.memberFeeCalc } }}>Submit</Link>
                         <input type="submit" value="Submit" onClick={this.onFormSubmit} />
                     </form>
                 </div>
