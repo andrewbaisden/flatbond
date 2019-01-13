@@ -10,9 +10,12 @@ class App extends Component {
             rent: '',
             postcode: ''
         }
+
+        this.paymentSelectRef = React.createRef()
     }
     componentDidMount(){
         this.getFlatbondAPI()
+        this.onSelectedOption()
     }
    async getFlatbondAPI(){
     try {
@@ -31,6 +34,15 @@ class App extends Component {
         console.log(this.state.rent);
         console.log(this.state.postcode);
     }
+    onSelectedOption = () => {
+        const select = this.paymentSelectRef.current;
+        const selectedPayment = select.options[select.selectedIndex].value;
+        console.log(selectedPayment);
+
+        if(selectedPayment === 'week'){
+            console.log('Week is selected')
+        }
+    }
     render() {
         return(
             <React.Fragment>
@@ -38,7 +50,11 @@ class App extends Component {
                 <div>
                     <form onSubmit={this.onFormSubmit}>
                         <label>Rent</label>
-                        <input type="text" placeholder="Rent" value={this.state.rent} onChange={e => this.setState({rent: e.target.value})} />
+                        <select ref={this.paymentSelectRef} onChange={this.onSelectedOption}>
+                            <option value="week">Weekly</option>
+                            <option value="month">Monthly</option>
+                        </select>
+                        <input type="number" placeholder="Rent" value={this.state.rent} onChange={e => this.setState({rent: e.target.value})} />
                         <label>Postcode</label>
                         <input type="text" placeholder="Postcode" value={this.state.postcode} onChange={e => this.setState({postcode: e.target.value})} />
                         <Link to={{ pathname: '/created-flatbond', state: { rent: this.state.rent, postcode: this.state.postcode } }}>Submit</Link>
