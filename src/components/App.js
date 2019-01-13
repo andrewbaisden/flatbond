@@ -19,7 +19,8 @@ class App extends Component {
             dataMemberFeeAmount: '',
             memberFeeCalc: 0,
             rent: 0,
-            postcode: ''
+            postcode: '',
+            canSubmit: false
         }
 
         this.paymentSelectRef = React.createRef();
@@ -54,6 +55,9 @@ class App extends Component {
         console.log(this.state.postcode);
         console.log(this.state.memberFeeCalc);
 
+      if(this.state.canSubmit === false) {
+          console.log('Cant submit form until you put in the correct data')
+      } else {
         axios.post('https://cxynbjn3wf.execute-api.eu-west-2.amazonaws.com/production/flatbond', {
             rent: this.state.rent,
             postcode: this.state.postcode
@@ -74,6 +78,7 @@ class App extends Component {
         .catch(error => {
             console.log(error)
         })
+      }
 
     }
     onSelectedOption = () => {
@@ -93,7 +98,7 @@ class App extends Component {
 
     }
     calcMemberFee = () => {
-        console.log('Rent', this.state.rent)
+        console.log('Rent', this.state.rent);
         
         const rent = this.state.rent;
         const membershipFee = this.state.dataMemberFee;
@@ -105,15 +110,44 @@ class App extends Component {
 
         if(rent < 120) {
             calcMembersFee = 120;
+            console.log('Its less than 120')
         }
 
         if(membershipFee === true) {
             calcMembersFee = membershipFeeAmount;
         }
 
-        this.setState({memberFeeCalc: calcMembersFee})
+        const select = this.paymentSelectRef.current;
+        const selectedPayment = select.options[select.selectedIndex].value;
 
-        console.log('Calculated members Fee', calcMembersFee)
+        if(selectedPayment === 'week' && rent < 25){
+            console.log('The minimum weekly, rent amount is £25');
+            this.weeklyPayRef.current.style.border = '2px solid red';
+            this.setState({canSubmit: false});
+            
+        } else if(selectedPayment === 'week' && rent > 2000) {
+            console.log('The maximum weekly, rent amount is £2000');
+            this.weeklyPayRef.current.style.border = '2px solid red';
+            this.setState({canSubmit: false});
+            
+        } else if(selectedPayment === 'month' && rent < 110) {
+            console.log('The minimum monthly, rent amount is £110');
+            this.monthlyPayRef.current.style.border = '2px solid red';
+            this.setState({canSubmit: false});
+
+        } else if(selectedPayment === 'month' && rent > 8660){
+            console.log('The maximum monthly, rent amount is £8660');
+            this.monthlyPayRef.current.style.border = '2px solid red';
+            this.setState({canSubmit: false});
+        } else {
+            this.setState({canSubmit: true});
+        }
+
+        this.setState({memberFeeCalc: calcMembersFee});
+
+        console.log('Calculated members Fee', calcMembersFee);
+
+        
        
     }
     render() {
