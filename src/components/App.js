@@ -14,6 +14,7 @@ class App extends Component {
     constructor(props) {
         super(props);
 
+        // Form data state
         this.state = {
             dataMemberFee: '',
             dataMemberFeeAmount: '',
@@ -23,6 +24,7 @@ class App extends Component {
             canSubmit: false
         }
 
+        // DOM element references
         this.paymentSelectRef = React.createRef();
         this.weeklyPayRef = React.createRef();
         this.monthlyPayRef = React.createRef();
@@ -32,10 +34,10 @@ class App extends Component {
     componentDidMount(){
         this.getFlatbondAPI();
         this.onSelectedOption();
-        
     }
    async getFlatbondAPI(){
     try {
+        // Calls the flatbond API and returns the data, holds it in state
         const response = await axios.get('https://cxynbjn3wf.execute-api.eu-west-2.amazonaws.com/production/config');
         console.log('Response', response);
         console.log('Data', response.data);
@@ -43,6 +45,8 @@ class App extends Component {
         this.setState({dataMemberFeeAmount: response.data.fixed_membership_fee});
         console.log('Member Fee', this.state.dataMemberFee);
         console.log('Member Fee Amount', this.state.dataMemberFeeAmount);
+
+        // Shows the form after a success 200 reponse from the flatbond API
         this.flatbondFormRef.current.classList.remove('hide');
 
     } catch(err) {
@@ -51,11 +55,14 @@ class App extends Component {
     }
     onFormSubmit = (e) => {
         e.preventDefault()
+
+        // Logs form input data to the console
         console.log('Clicked Form Submit Button');
         console.log(this.state.rent);
         console.log(this.state.postcode);
         console.log(this.state.memberFeeCalc);
 
+        // Only submits the form and redirects to the create-flatbond page if the fields have the correct validation input
       if(this.state.canSubmit === false) {
           console.log('Cant submit form until you put in the correct data')
       } else {
@@ -68,6 +75,7 @@ class App extends Component {
             console.log(response.data.status)
             const status = response.data.status;
 
+            // Checks for a created response from the server before recirecting to the create-flatbond page
             if(status === 'created') {
                 console.log('The flatbond was created');
                 this.props.history.push({
@@ -87,6 +95,7 @@ class App extends Component {
         const selectedPayment = select.options[select.selectedIndex].value;
         console.log(selectedPayment);
 
+        // Checks to see which option is selected and then shows/hide the week/month text input
         if(selectedPayment === 'week'){
             console.log('Week is selected');
             this.weeklyPayRef.current.classList.remove('hide');
@@ -101,6 +110,7 @@ class App extends Component {
     calcMemberFee = () => {
         console.log('Rent', this.state.rent);
         
+        // Buiness logic calculation for the rent
         const rent = this.state.rent;
         const membershipFee = this.state.dataMemberFee;
         const membershipFeeAmount = this.state.dataMemberFeeAmount;
@@ -121,6 +131,7 @@ class App extends Component {
         const select = this.paymentSelectRef.current;
         const selectedPayment = select.options[select.selectedIndex].value;
 
+        // Input validation for the rent fields
         if(selectedPayment === 'week' && rent < 25){
             console.log('The minimum weekly, rent amount is £25');
             this.weeklyPayRef.current.style.border = '2px solid red';
@@ -154,6 +165,7 @@ class App extends Component {
     validatePostCode = () => {
         console.log('Postcode', this.state.postcode);
 
+        // Regex validation for a UK postcode
         const postcode = this.state.postcode;
         const re = /^([A-PR-UWYZ0-9][A-HK-Y0-9][AEHMNPRTVXY0-9]?[ABEHMNPRVWXY0-9]? {1,2}[0-9][ABD-HJLN-UW-Z]{2}|GIR 0AA)$/;
 

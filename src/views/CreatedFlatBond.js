@@ -10,6 +10,7 @@ class CreatedFlatBond extends Component {
         this.getData();
     }
     getData = () => {
+        // Gets the form data state which was passed from the App.js component, form page
         const rent = this.props.location.state.rent;
         this.setState({rent: rent})
 
