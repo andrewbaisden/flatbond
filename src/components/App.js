@@ -27,6 +27,7 @@ class App extends Component {
         this.weeklyPayRef = React.createRef();
         this.monthlyPayRef = React.createRef();
         this.flatbondFormRef = React.createRef();
+        this.postcodeRef = React.createRef();
     }
     componentDidMount(){
         this.getFlatbondAPI();
@@ -140,15 +141,30 @@ class App extends Component {
             this.monthlyPayRef.current.style.border = '2px solid red';
             this.setState({canSubmit: false});
         } else {
+            this.weeklyPayRef.current.style.border = '2px solid green';
+            this.monthlyPayRef.current.style.border = '2px solid green';
             this.setState({canSubmit: true});
         }
 
         this.setState({memberFeeCalc: calcMembersFee});
 
         console.log('Calculated members Fee', calcMembersFee);
-
-        
        
+    }
+    validatePostCode = () => {
+        console.log('Postcode', this.state.postcode);
+
+        const postcode = this.state.postcode;
+        const re = /^([A-PR-UWYZ0-9][A-HK-Y0-9][AEHMNPRTVXY0-9]?[ABEHMNPRVWXY0-9]? {1,2}[0-9][ABD-HJLN-UW-Z]{2}|GIR 0AA)$/;
+
+        if(!re.test(postcode)){
+            this.postcodeRef.current.style.border = '2px solid red';
+            this.setState({canSubmit: false});
+        } else {
+            this.postcodeRef.current.style.border = '2px solid green';
+            this.setState({canSubmit: true});
+        }
+
     }
     render() {
         return(
@@ -167,7 +183,7 @@ class App extends Component {
                         <label>Membership Fee</label>
                         <p>{this.state.memberFeeCalc}</p>
                         <label>Postcode</label>
-                        <input type="text" placeholder="Postcode" value={this.state.postcode} onChange={e => this.setState({postcode: e.target.value})} />
+                        <input ref={this.postcodeRef} type="text" placeholder="Postcode" value={this.state.postcode} onChange={e => this.setState({postcode: e.target.value})} onBlur={this.validatePostCode} />
                         <input type="submit" value="Submit" onClick={this.onFormSubmit} />
                     </form>
                 </div>
