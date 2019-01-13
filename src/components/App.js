@@ -108,7 +108,7 @@ class App extends Component {
             dataMemberFee: '',
             dataMemberFeeAmount: '',
             memberFeeCalc: 0,
-            rent: 0,
+            rent: 25,
             postcode: '',
             canSubmit: false,
             weeklyRentError: 'The miniumum weekly rent is £25, and the maximum is £2000.',
@@ -261,7 +261,15 @@ class App extends Component {
             this.monthlyPayRef.current.style.border = '2px solid #E20404';
             this.errorMonthlyRef.current.classList.add('show');
             this.setState({canSubmit: false});
-        } else {
+        } else if(selectedPayment === 'week' && rent === 0) {
+            console.log('It has to be greater than zero!');
+            this.setState({canSubmit: false});
+        }
+        else if(selectedPayment === 'month' && rent === 0) {
+            console.log('It has to be greater than zero!');
+            this.setState({canSubmit: false});
+        }
+         else {
             this.weeklyPayRef.current.style.border = '2px solid #03BA9B';
             this.monthlyPayRef.current.style.border = '2px solid #03BA9B';
             this.errorWeeklyRef.current.classList.remove('show');
