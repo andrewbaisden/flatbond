@@ -289,7 +289,7 @@ class App extends Component {
 
         // Regex validation for a UK postcode
         const postcode = this.state.postcode;
-        const re = /^([A-PR-UWYZ0-9][A-HK-Y0-9][AEHMNPRTVXY0-9]?[ABEHMNPRVWXY0-9]? {1,2}[0-9][ABD-HJLN-UW-Z]{2}|GIR 0AA)$/;
+        const re = /\b((?:(?:gir)|(?:[a-pr-uwyz])(?:(?:[0-9](?:[a-hjkpstuw]|[0-9])?)|(?:[a-hk-y][0-9](?:[0-9]|[abehmnprv-y])?)))) ?([0-9][abd-hjlnp-uw-z]{2})\b/;
 
         if(!re.test(postcode)){
             this.postcodeRef.current.style.border = '2px solid #E20404';
