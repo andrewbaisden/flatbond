@@ -5,13 +5,14 @@ import CreatedFlatbond from './views/CreatedFlatBond';
 import NotFound from './views/NotFound';
 
 const Router = () => (
-  <BrowserRouter>
-    <Switch>
-      <Route exact path="/" component={App} />
-      <Route exact path="/created-flatbond" component={CreatedFlatbond} />
-        <Route component={NotFound} />
-    </Switch>
-  </BrowserRouter>
+	<BrowserRouter>
+		<Switch>
+			<Route exact path="/" component={App} />
+			{/* <Route exact path="/created-flatbond" component={CreatedFlatbond} /> */}
+			<Route path="/created-flatbond" render={props => <CreatedFlatbond {...props} />} />
+			<Route component={NotFound} />
+		</Switch>
+	</BrowserRouter>
 );
 
 export default Router;

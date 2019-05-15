@@ -50,42 +50,56 @@ const GlobalStyle = createGlobalStyle`
             cursor: pointer;
         }
     }
-`
+`;
 class CreatedFlatBond extends Component {
-    state = {
-        rent: '',
-        postcode: '',
-        memberFee: ''
-    }
-    componentDidMount(){
-        this.getData();
-    }
-    getData = () => {
-        // Gets the form data state which was passed from the App.js component, form page
-        const rent = this.props.location.state.rent;
-        this.setState({rent: rent})
+	constructor(props) {
+		super(props);
 
-        const postcode = this.props.location.state.postcode;
-        this.setState({postcode: postcode})
+		this.state = {
+			rent: '',
+			postcode: '',
+			memberFee: ''
+		};
 
-        const memberFee = this.props.location.state.memberFee;
-        this.setState({memberFee: memberFee})
-    }
-    render(){
-        return(
-            <React.Fragment>
-                <GlobalStyle />
-                <div className="flat-bond">
-                <h1>Your Flatbond has been created!</h1>
-                <p><b>Rent:</b> £{this.state.rent}</p>
-                <p><b>Postcode:</b> {this.state.postcode}</p>
-                <p><b>Your Member Fee:</b> £{this.state.memberFee}</p>
-                <Link href='/' to='/'>Create a new Flatbond</Link>
-                </div>
-                
-            </React.Fragment>
-        )
-    }
+		this.getData = this.getData.bind(this);
+	}
+
+	componentDidMount() {
+		this.getData();
+	}
+
+	getData = () => {
+		// Gets the form data state which was passed from the App.js component, form page
+		const rent = this.props.location.state.rent;
+		this.setState({ rent: rent });
+		const postcode = this.props.location.state.postcode;
+		this.setState({ postcode: postcode });
+		const memberFee = this.props.location.state.memberFee;
+		this.setState({ memberFee: memberFee });
+		console.log(this.props.location);
+	};
+	render() {
+		return (
+			<React.Fragment>
+				<GlobalStyle />
+				<div className="flat-bond">
+					<h1>Your Flatbond has been created!</h1>
+					<p>
+						<b>Rent:</b> £{this.state.rent}
+					</p>
+					<p>
+						<b>Postcode:</b> {this.state.postcode}
+					</p>
+					<p>
+						<b>Your Member Fee:</b> £{this.state.memberFee}
+					</p>
+					<Link href="/" to="/">
+						Create a new Flatbond
+					</Link>
+				</div>
+			</React.Fragment>
+		);
+	}
 }
 
 export default CreatedFlatBond;
